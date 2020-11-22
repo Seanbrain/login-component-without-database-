@@ -17,7 +17,7 @@ initializePassport(passport, // the password we are configuring
     id => users.find(user => user.id === id),
 )
 
-const users = [] // THE USER INFORMATION IS STORE HERE IN LOCAL VARIABLE INSIDE OUR SERVER. NO DATABASE IS UTILIZED IN THIS PROJECT.
+const users = [] // THE USER INFORMATION IS STORED HERE IN LOCAL VARIABLE INSIDE OUR SERVER. NO DATABASE IS UTILIZED IN THIS PROJECT.
 
 app.set('view-engine', 'ejs')
 app.use(express.urlencoded({extended: false})) // this line is saying that we want to be able to access our data from the form inside of our req variable and inside of our post method
@@ -25,7 +25,7 @@ app.use(flash())
 app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialize: false
+    saveUninitialized: false
 }))
 
 app.use(passport.initialize())
@@ -41,7 +41,7 @@ app.get('/login', checkNotAuthenticated, (req, res) => {
 })
 app.post('/login', checkNotAuthenticated, passport.authenticate('local', {
     successRedirect: "/",
-    failurRedirect : '/login',
+    failureRedirect : '/login',
     failureFlash: true
     
 }))
@@ -50,10 +50,10 @@ app.get('/register', checkNotAuthenticated, (req, res) => {
     res.render('register.ejs')
 })
 
-app.post('/register', checkNotAuthenticated, async (req, res) => { 
+app.post('/register', checkNotAuthenticated,  async (req, res) => { 
   // create a new user with the correct hashed password
-  try {
-      const hashedPassword = await bcrypt.hash(req.body.password, 10) // generates the hash 10 times OR SECURITY  
+  try {      
+      const hashedPassword =  await bcrypt.hash(req.body.password, 10) // generates the hash 10 times OR SECURITY  
       users.push({
           id: Date.now().toString(),
           name: req.body.name,
@@ -61,12 +61,12 @@ app.post('/register', checkNotAuthenticated, async (req, res) => {
           password: hashedPassword
       })
       res.redirect('/login')
-  }  catch {
+  }  catch{
       res.redirect('/register')
   }
-  console.log(users)
+  
 })
-app.delete('/logout', (req,res) => {
+app.delete('/logout', (req, res,) => {
     req.logOut()
     res.redirect('/login')
 })
@@ -80,9 +80,12 @@ function checkAuthenticated(req,res,next) {
 
 function checkNotAuthenticated(req,res,next) {
     if (req.isAuthenticated ()) {
-       return res.redirect('/')
+        return res.redirect('/')
+             
     } 
-    next()
+     next()
+   
+  
 }
 
 app.listen(3000)
